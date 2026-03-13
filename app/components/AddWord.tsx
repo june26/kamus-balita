@@ -1,3 +1,7 @@
+"use client";
+import { useState } from "react";
+import { db } from "@/lib/firebase";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import {
   Dialog,
   DialogTrigger,
@@ -8,8 +12,37 @@ import {
   DialogClose,
 } from "./ui/dialog";
 import { Button } from "./ui/button";
+import { toast } from "sonner";
 
 export default function AddWord() {
+  const [toddlerWord, setToddlerWord] = useState("");
+  const [meaning, setMeaning] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleAddWord = async () => {
+    if (!toddlerWord || !meaning)
+      return toast.error("Isi semua kolom dulu!", { position: "top-center" });
+
+    setLoading(true);
+    try {
+      await addDoc(collection(db, "words"), {
+        toddler: toddlerWord,
+        meaning: meaning,
+        createdAt: serverTimestamp(),
+      });
+      setToddlerWord("");
+      setMeaning("");
+      toast.success("Kata berhasil ditambahkan", { position: "top-center" });
+    } catch (error) {
+      console.error("Error adding word:", error);
+      toast.error("Oops! Gagal menambahkan kata, silahkan coba lagi", {
+        position: "top-center",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -32,11 +65,15 @@ export default function AddWord() {
             type="text"
             placeholder="Apa Kata Upay?"
             className="border rounded px-3 py-2 outline-none focus:ring-2 focus:ring-blue-200"
+            value={toddlerWord}
+            onChange={(e) => setToddlerWord(e.target.value)}
           />
           <input
             type="text"
             placeholder="Artinya"
             className="border rounded px-3 py-2 outline-none focus:ring-2 focus:ring-blue-200"
+            value={meaning}
+            onChange={(e) => setMeaning(e.target.value)}
           />
         </div>
 
@@ -46,7 +83,13 @@ export default function AddWord() {
               Batal
             </Button>
           </DialogClose>
-          <Button className="cursor-pointer">Tambah</Button>
+          <Button
+            className="cursor-pointer"
+            onClick={handleAddWord}
+            disabled={loading}
+          >
+            {loading ? "Menambahkan..." : "Tambah"}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
