@@ -63,8 +63,14 @@ export default function WordContainer() {
               ))}
         </div>
       </div>
-      <div className="py-3 z-10 flex justify-center w-full text-gray-400 shadow-[0_-4px_10px_rgba(0,0,0,0.2)]">
-        from Dad with <i className="text-pink-400 ri-heart-3-fill ml-2" />
+      <div className="py-3 z-10 flex justify-between px-4 w-full text-gray-400 shadow-[0_-4px_10px_rgba(0,0,0,0.2)]">
+        <div>
+          Total Kata:{" "}
+          <span className="font-medium">{filteredWords?.length}</span>
+        </div>
+        <div>
+          from Dad with <i className="text-pink-400 ri-heart-3-fill ml-1" />
+        </div>
       </div>
     </main>
   );
