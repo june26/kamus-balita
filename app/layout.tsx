@@ -24,8 +24,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${fredoka.variable} font-sans`}>
-        {children}
         <Toaster richColors />
+        {children}
       </body>
     </html>
   );

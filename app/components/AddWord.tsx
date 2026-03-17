@@ -64,14 +64,14 @@ export default function AddWord() {
           <input
             type="text"
             placeholder="Apa Kata Upay?"
-            className="border rounded px-3 py-2 outline-none focus:ring-2 focus:ring-blue-200"
+            className="border text-base rounded px-3 py-2 outline-none focus:ring-2 focus:ring-blue-200"
             value={toddlerWord}
             onChange={(e) => setToddlerWord(e.target.value)}
           />
           <input
             type="text"
             placeholder="Artinya"
-            className="border rounded px-3 py-2 outline-none focus:ring-2 focus:ring-blue-200"
+            className="border text-base rounded px-3 py-2 outline-none focus:ring-2 focus:ring-blue-200"
             value={meaning}
             onChange={(e) => setMeaning(e.target.value)}
           />
