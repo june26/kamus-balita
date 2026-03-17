@@ -52,7 +52,7 @@ export default function AddWord() {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-md lg:max-w-screen-lg overflow-y-scroll max-h-screen">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Tambah Kata Baru</DialogTitle>
           <DialogDescription>
