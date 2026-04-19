@@ -1,10 +1,10 @@
 "use client";
-import { useState } from "react";
+import { useRef } from "react";
 import { db } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -13,26 +13,50 @@ import {
 } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
+import confetti from "canvas-confetti";
+import { useState } from "react";
 
-export default function AddWord() {
+type Props = {
+  childName: string | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+};
+
+export default function AddWord({ childName, open, onOpenChange }: Props) {
   const [toddlerWord, setToddlerWord] = useState("");
   const [meaning, setMeaning] = useState("");
   const [loading, setLoading] = useState(false);
+  const meaningRef = useRef<HTMLInputElement>(null);
 
   const handleAddWord = async () => {
     if (!toddlerWord || !meaning)
       return toast.error("Isi semua kolom dulu!", { position: "top-center" });
+
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    if (!user) {
+      return toast.error("Harus login dulu!", { position: "top-center" });
+    }
 
     setLoading(true);
     try {
       await addDoc(collection(db, "words"), {
         toddler: toddlerWord,
         meaning: meaning,
+        userId: user.uid,
         createdAt: serverTimestamp(),
       });
       setToddlerWord("");
       setMeaning("");
-      toast.success("Kata berhasil ditambahkan", { position: "top-center" });
+      onOpenChange(false);
+      toast.success("Kata berhasil ditambahkan 🎉", { position: "top-center" });
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.55 },
+        colors: ["#fcd267", "#f9a8d4", "#a5b4fc", "#86efac", "#fdba74"],
+      });
     } catch (error) {
       console.error("Error adding word:", error);
       toast.error("Oops! Gagal menambahkan kata, silahkan coba lagi", {
@@ -44,14 +68,7 @@ export default function AddWord() {
   };
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button className="cursor-pointer bg-[#fcd267] border border-[#9d740c] rounded-full px-4 py-4 w-auto text-center text-[#9d740c] font-medium hover:bg-[#e6b538]/90 transition">
-          <i className="ri-add-line mr-1" />
-          Tambah Kata
-        </Button>
-      </DialogTrigger>
-
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Tambah Kata Baru</DialogTitle>
@@ -63,17 +80,30 @@ export default function AddWord() {
         <div className="flex flex-col space-y-4 mt-4">
           <input
             type="text"
-            placeholder="Apa Kata Upay?"
+            placeholder={`Apa kata ${childName ?? "si kecil"}?`}
             className="border text-base rounded px-3 py-2 outline-none focus:ring-2 focus:ring-blue-200"
             value={toddlerWord}
             onChange={(e) => setToddlerWord(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                meaningRef.current?.focus();
+              }
+            }}
           />
           <input
+            ref={meaningRef}
             type="text"
             placeholder="Artinya"
             className="border text-base rounded px-3 py-2 outline-none focus:ring-2 focus:ring-blue-200"
             value={meaning}
             onChange={(e) => setMeaning(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleAddWord();
+              }
+            }}
           />
         </div>
 

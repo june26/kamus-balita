@@ -2,7 +2,7 @@
 
 import { motion, useAnimation, PanInfo } from "framer-motion";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { doc, deleteDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import {
@@ -21,6 +21,8 @@ type WordCardProps = {
   from: string;
   to: string;
   index: number;
+  createdAt: Date | null;
+  childName: string | null;
 };
 
 const pastelColors = [
@@ -40,11 +42,21 @@ function getHash(str: string) {
   return Math.abs(hash);
 }
 
-export default function WordCard({ id, from, to, index }: WordCardProps) {
+function formatDate(date: Date | null) {
+  if (!date) return "";
+  return date.toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+export default function WordCard({ id, from, to, index, createdAt, childName }: WordCardProps) {
   const controls = useAnimation();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editWord, setEditWord] = useState({ from, to });
+  const meaningRef = useRef<HTMLInputElement>(null);
 
   const hash = getHash(from + to);
   const colorIndex = (hash + index) % pastelColors.length;
@@ -108,10 +120,23 @@ export default function WordCard({ id, from, to, index }: WordCardProps) {
   };
 
   return (
-    <div className="px-4 relative mb-4">
+    <motion.div
+      className="px-4 relative mb-4"
+      initial={{ opacity: 0, y: 16, scale: 0.97 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, x: -60, scale: 0.95 }}
+      transition={{ type: "spring", stiffness: 300, damping: 28 }}
+      layout
+    >
       <div className="absolute inset-y-0 right-4 flex items-center space-x-2 z-0">
         <div className="flex flex-col items-center space-y-1">
-          <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+          <Dialog
+            open={editDialogOpen}
+            onOpenChange={(open) => {
+              setEditDialogOpen(open);
+              if (!open) setEditWord({ from, to });
+            }}
+          >
             <DialogTrigger asChild>
               <button className="w-11 h-11 cursor-pointer bg-blue-400 text-white rounded-full flex items-center justify-center hover:bg-blue-500 transition-colors">
                 <i className="ri-pencil-fill text-lg" />
@@ -127,20 +152,33 @@ export default function WordCard({ id, from, to, index }: WordCardProps) {
               <div className="flex flex-col space-y-2 mt-4">
                 <input
                   type="text"
-                  placeholder="Kata Upay"
+                  placeholder={`Kata ${childName ?? "si kecil"}`}
                   value={editWord.from}
                   onChange={(e) =>
                     setEditWord({ ...editWord, from: e.target.value })
                   }
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      meaningRef.current?.focus();
+                    }
+                  }}
                   className="border rounded px-3 py-2 outline-none focus:ring-2 focus:ring-blue-200"
                 />
                 <input
+                  ref={meaningRef}
                   type="text"
                   placeholder="Artinya"
                   value={editWord.to}
                   onChange={(e) =>
                     setEditWord({ ...editWord, to: e.target.value })
                   }
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleEdit();
+                    }
+                  }}
                   className="border rounded px-3 py-2 outline-none focus:ring-2 focus:ring-blue-200"
                 />
               </div>
@@ -207,13 +245,19 @@ export default function WordCard({ id, from, to, index }: WordCardProps) {
         <div
           className={`border-2 ${color.border} rounded-lg border-dashed px-4 py-3`}
         >
-          <div className={`flex items-center space-x-4 ${color.text}`}>
-            <p className="font-medium text-2xl">{from}</p>
-            <i className="ri-arrow-right-long-line text-2xl" />
-            <p className="font-medium text-2xl">{to}</p>
+          <div className="flex items-center justify-between">
+            <div className={`flex items-center space-x-4 ${color.text}`}>
+              <p className="font-medium text-2xl">{from}</p>
+              <i className="ri-arrow-right-long-line text-2xl" />
+              <p className="font-medium text-2xl">{to}</p>
+            </div>
+            <i className="ri-arrow-left-s-line text-gray-300 text-xl ml-2 flex-shrink-0" />
           </div>
+          {createdAt && (
+            <p className="text-xs text-gray-300 mt-1">{formatDate(createdAt)}</p>
+          )}
         </div>
       </motion.div>
-    </div>
+    </motion.div>
   );
 }

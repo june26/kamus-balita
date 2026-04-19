@@ -4,28 +4,28 @@ import { useEffect, useState } from "react";
 import WordContainer from "./WordContainer";
 import LoginModal from "./LoginForm";
 import { auth } from "@/lib/firebase";
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, User } from "firebase/auth";
 import { Button } from "./ui/button";
+import PastelText from "@/helper/pastelText";
 
 export default function MainWrapper() {
-  const [user, setUser] = useState<null | object>(null);
-  const [loadingAuth, setLoadingAuth] = useState(true); // menunggu auth selesai
-  const [showLogin, setShowLogin] = useState(true); // default modal terbuka
+  const [user, setUser] = useState<User | null>(null);
+  const [childName, setChildName] = useState<string | null>(null);
+  const [loadingAuth, setLoadingAuth] = useState(true);
+  const [showLogin, setShowLogin] = useState(true);
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (u) => {
       setUser(u);
-      setLoadingAuth(false); // auth sudah dicek
-      if (u)
-        setShowLogin(false); // kalau sudah login, tutup modal
-      else setShowLogin(true); // kalau belum login, buka modal
+      setChildName(u?.displayName ?? null);
+      setLoadingAuth(false);
+      if (u) setShowLogin(false);
+      else setShowLogin(true);
     });
-
     return () => unsub();
   }, []);
 
   if (loadingAuth) {
-    // Sementara menunggu Firebase, bisa tampil spinner atau blank
     return (
       <div className="flex justify-center items-center h-[50vh] text-white">
         Loading...
@@ -33,10 +33,16 @@ export default function MainWrapper() {
     );
   }
 
+  const title = childName ? `Kamus ${childName}` : "Kamus Toddler";
+
   return (
     <>
+      <h1 className="text-5xl font-bold my-4">
+        <PastelText text={title} />
+      </h1>
+
       {user ? (
-        <WordContainer />
+        <WordContainer childName={childName} onNameChange={setChildName} />
       ) : (
         <div className="flex flex-col items-center space-y-4 mt-4">
           <p className="text-gray-200 text-center">
@@ -51,7 +57,6 @@ export default function MainWrapper() {
         </div>
       )}
 
-      {/* Login Modal */}
       <LoginModal open={showLogin} onOpenChange={setShowLogin} />
     </>
   );

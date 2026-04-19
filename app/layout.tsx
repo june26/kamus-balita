@@ -11,9 +11,9 @@ const fredoka = Fredoka({
 });
 
 export const metadata: Metadata = {
-  title: "Kamus Upay",
+  title: "Kamus Toddler",
   description:
-    "Kamus Upay adalah aplikasi kamus sederhana untuk membantu orang tua dan pengasuh memahami bahasa bayi dengan mudah.",
+    "Kamus Toddler adalah aplikasi kamus sederhana untuk membantu orang tua dan pengasuh memahami bahasa bayi dengan mudah.",
 };
 
 export default function RootLayout({
