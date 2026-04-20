@@ -37,9 +37,7 @@ export default function WordContainer({ childName, onNameChange }: Props) {
 
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       if (!user) return;
-
       if (!user.displayName) setNameDialogOpen(true);
-
       unsubscribeFirestore = subscribeWords(user.uid, (data) => {
         setWords(data);
         setLoading(false);
@@ -97,10 +95,7 @@ export default function WordContainer({ childName, onNameChange }: Props) {
               value={nameInput}
               onChange={(e) => setNameInput(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  handleSaveName();
-                }
+                if (e.key === "Enter") { e.preventDefault(); handleSaveName(); }
               }}
             />
           </div>
@@ -114,95 +109,93 @@ export default function WordContainer({ childName, onNameChange }: Props) {
 
       <AddWord childName={childName} open={addWordOpen} onOpenChange={setAddWordOpen} />
 
-      <main className="flex w-full max-w-3xl shadow-lg flex-col items-center justify-between md:rounded-xl bg-white sm:items-start">
-        <div className="w-full bg-[#eef3f8] rounded-t-xl">
-          <div className="px-4 rounded-t-xl bg-white flex justify-between py-3 shadow-[0_4px_10px_rgba(0,0,0,0.1)] relative z-12">
-            <div className="relative w-[250px]">
-              <i className="ri-search-2-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Cari kata..."
-                className="w-full text-gray-500 bg-gray-100 border border-gray-300 rounded-full pl-9 pr-8 py-1 outline-none placeholder:text-gray-400 focus:ring-2 focus:ring-blue-200"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-              {search && (
-                <button
-                  onClick={() => setSearch("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
-                >
-                  <i className="ri-close-line" />
-                </button>
-              )}
-            </div>
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={() => setAddWordOpen(true)}
-                className="hidden md:flex cursor-pointer items-center bg-[#fcd267] border border-[#9d740c] rounded-full px-4 py-2 text-[#9d740c] font-medium hover:bg-[#e6b538]/90 transition"
-              >
-                <i className="ri-add-line mr-1" />
-                Tambah Kata
-              </button>
-              <button
-                onClick={() => setNameDialogOpen(true)}
-                className="cursor-pointer w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-blue-100 text-gray-400 hover:text-blue-400 transition"
-                title="Ganti nama"
-              >
-                <i className="ri-user-line text-lg" />
-              </button>
-              <button
-                onClick={() =>
-                  signOut(getAuth()).then(() => toast.success("Logout berhasil"))
-                }
-                className="cursor-pointer w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-red-100 text-gray-400 hover:text-red-400 transition"
-                title="Logout"
-              >
-                <i className="ri-logout-box-r-line text-lg" />
-              </button>
-            </div>
-          </div>
+      {/* main: full-screen flex column on mobile, capped card on desktop */}
+      <main className="flex flex-col w-full flex-1 bg-white md:flex-none md:max-w-3xl md:rounded-xl md:shadow-lg md:mb-8 overflow-hidden">
 
-          <div className="py-5 space-y-4 min-h-[calc(100dvh-190px)] max-h-[calc(100dvh-180px)] md:max-h-[60vh] md:min-h-auto overflow-y-auto pb-24 md:pb-5">
-            {loading ? (
-              Array.from({ length: 4 }).map((_, i) => (
-                <Skeleton
-                  key={i}
-                  className="h-[70px] w-auto rounded-md bg-gray-500 mx-4 animate-pulse"
-                />
-              ))
-            ) : filteredWords.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full py-16 px-4 select-none">
-                <div className="text-6xl mb-4 animate-bounce">🧸</div>
-                <p className="text-2xl font-bold text-gray-400 mb-1">
-                  {search ? "Kata tidak ditemukan!" : "Belum ada kata nih~"}
-                </p>
-                <p className="text-sm text-gray-400 text-center">
-                  {search
-                    ? `"${search}" belum ada di kamus`
-                    : `Yuk tambah kata pertama ${childName ?? "si kecil"}! 🌟`}
-                </p>
-              </div>
-            ) : (
-              <AnimatePresence mode="popLayout">
-                {filteredWords.map((word, i) => (
-                  <WordCard
-                    key={word.id}
-                    id={word.id}
-                    index={i + 1}
-                    from={word.toddler}
-                    to={word.meaning}
-                    createdAt={word.createdAt}
-                    childName={childName}
-                  />
-                ))}
-              </AnimatePresence>
+        {/* sticky header */}
+        <div className="shrink-0 px-4 bg-white flex justify-between py-3 shadow-[0_4px_10px_rgba(0,0,0,0.1)] relative z-10">
+          <div className="relative flex-1 mr-3">
+            <i className="ri-search-2-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Cari kata..."
+              className="w-full text-gray-500 bg-gray-100 border border-gray-300 rounded-full pl-9 pr-8 py-1.5 outline-none placeholder:text-gray-400 focus:ring-2 focus:ring-blue-200"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            {search && (
+              <button
+                onClick={() => setSearch("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
+              >
+                <i className="ri-close-line" />
+              </button>
             )}
           </div>
+          <div className="flex items-center space-x-2 shrink-0">
+            <button
+              onClick={() => setAddWordOpen(true)}
+              className="hidden md:flex cursor-pointer items-center bg-[#fcd267] border border-[#9d740c] rounded-full px-4 py-2 text-[#9d740c] font-medium hover:bg-[#e6b538]/90 transition"
+            >
+              <i className="ri-add-line mr-1" />
+              Tambah Kata
+            </button>
+            <button
+              onClick={() => setNameDialogOpen(true)}
+              className="cursor-pointer w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-blue-100 text-gray-400 hover:text-blue-400 transition"
+              title="Ganti nama"
+            >
+              <i className="ri-user-line text-lg" />
+            </button>
+            <button
+              onClick={() => signOut(getAuth()).then(() => toast.success("Logout berhasil"))}
+              className="cursor-pointer w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-red-100 text-gray-400 hover:text-red-400 transition"
+              title="Logout"
+            >
+              <i className="ri-logout-box-r-line text-lg" />
+            </button>
+          </div>
         </div>
-        <div className="py-3 z-10 flex justify-between px-4 w-full text-gray-400 shadow-[0_-4px_10px_rgba(0,0,0,0.2)]">
+
+        {/* scrollable word list — only this scrolls */}
+        <div className="flex-1 overflow-y-auto overscroll-contain bg-[#eef3f8] py-4 space-y-3 pb-24 md:pb-6">
+          {loading ? (
+            Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} className="h-[70px] w-auto rounded-md bg-gray-300 mx-4 animate-pulse" />
+            ))
+          ) : filteredWords.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-full py-16 px-4 select-none">
+              <div className="text-6xl mb-4 animate-bounce">🧸</div>
+              <p className="text-2xl font-bold text-gray-400 mb-1">
+                {search ? "Kata tidak ditemukan!" : "Belum ada kata nih~"}
+              </p>
+              <p className="text-sm text-gray-400 text-center">
+                {search
+                  ? `"${search}" belum ada di kamus`
+                  : `Yuk tambah kata pertama ${childName ?? "si kecil"}! 🌟`}
+              </p>
+            </div>
+          ) : (
+            <AnimatePresence mode="popLayout">
+              {filteredWords.map((word, i) => (
+                <WordCard
+                  key={word.id}
+                  id={word.id}
+                  index={i + 1}
+                  from={word.toddler}
+                  to={word.meaning}
+                  createdAt={word.createdAt}
+                  childName={childName}
+                />
+              ))}
+            </AnimatePresence>
+          )}
+        </div>
+
+        {/* footer */}
+        <div className="shrink-0 py-3 flex justify-between px-4 w-full text-gray-400 shadow-[0_-4px_10px_rgba(0,0,0,0.1)] bg-white z-10">
           <div>
-            Total Kata:{" "}
-            <span className="font-medium">{filteredWords?.length}</span>
+            Total Kata: <span className="font-medium">{filteredWords.length}</span>
           </div>
           <div>
             from Dad with <i className="text-pink-400 ri-heart-3-fill ml-1" />

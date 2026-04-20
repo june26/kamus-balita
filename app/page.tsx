@@ -2,7 +2,7 @@ import MainWrapper from "./components/MainWrapper";
 
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen items-center justify-center bg-[#b7d2ed] font-sans">
+    <div className="h-dvh overflow-hidden flex flex-col items-center bg-[#b7d2ed] font-sans md:h-auto md:overflow-visible md:min-h-screen md:justify-center">
       <MainWrapper />
     </div>
   );

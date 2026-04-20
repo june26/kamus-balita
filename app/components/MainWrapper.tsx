@@ -27,7 +27,7 @@ export default function MainWrapper() {
 
   if (loadingAuth) {
     return (
-      <div className="flex justify-center items-center h-[50vh] text-white">
+      <div className="flex justify-center items-center h-dvh text-white">
         Loading...
       </div>
     );
@@ -36,8 +36,8 @@ export default function MainWrapper() {
   const title = childName ? `Kamus ${childName}` : "Kamus Toddler";
 
   return (
-    <>
-      <h1 className="text-5xl font-bold my-4">
+    <div className="flex flex-col items-center w-full flex-1 md:flex-none md:w-auto">
+      <h1 className="text-4xl md:text-5xl font-bold mt-4 mb-3 md:my-4 shrink-0">
         <PastelText text={title} />
       </h1>
 
@@ -58,6 +58,6 @@ export default function MainWrapper() {
       )}
 
       <LoginModal open={showLogin} onOpenChange={setShowLogin} />
-    </>
+    </div>
   );
 }
