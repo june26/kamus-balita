@@ -110,7 +110,7 @@ export default function WordContainer({ childName, onNameChange }: Props) {
       <AddWord childName={childName} open={addWordOpen} onOpenChange={setAddWordOpen} />
 
       {/* main: full-screen flex column on mobile, capped card on desktop */}
-      <main className="flex flex-col w-full flex-1 bg-white md:flex-none md:max-w-3xl md:rounded-xl md:shadow-lg md:mb-8 overflow-hidden">
+      <main className="flex flex-col w-full flex-1 min-h-0 bg-white overflow-hidden md:flex-none md:max-w-3xl md:rounded-xl md:shadow-lg md:max-h-[calc(100vh-9rem)]">
 
         {/* sticky header */}
         <div className="shrink-0 px-4 bg-white flex justify-between py-3 shadow-[0_4px_10px_rgba(0,0,0,0.1)] relative z-10">
@@ -158,7 +158,7 @@ export default function WordContainer({ childName, onNameChange }: Props) {
         </div>
 
         {/* scrollable word list — only this scrolls */}
-        <div className="flex-1 overflow-y-auto overscroll-contain bg-[#eef3f8] py-4 space-y-3 pb-24 md:pb-6">
+        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain bg-[#eef3f8] py-4 space-y-3 pb-24 md:pb-6">
           {loading ? (
             Array.from({ length: 4 }).map((_, i) => (
               <Skeleton key={i} className="h-[70px] w-auto rounded-md bg-gray-300 mx-4 animate-pulse" />

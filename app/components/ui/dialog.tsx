@@ -62,7 +62,7 @@ function DialogOverlay({
       ref={ref}
       data-slot="dialog-overlay"
       className={cn(
-        "fixed grid place-items-center overflow-auto left-0 right-0 isolate z-50 bg-black/10 duration-100 supports-backdrop-filter:backdrop-blur-xs data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0",
+        "fixed grid place-items-center overflow-auto inset-0 isolate z-50 bg-black/10 duration-100 supports-backdrop-filter:backdrop-blur-xs data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0",
         className,
       )}
       {...props}

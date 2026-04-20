@@ -36,7 +36,7 @@ export default function MainWrapper() {
   const title = childName ? `Kamus ${childName}` : "Kamus Toddler";
 
   return (
-    <div className="flex flex-col items-center w-full flex-1 md:flex-none md:w-auto">
+    <div className="flex flex-col items-center w-full flex-1 min-h-0 md:flex-none md:w-auto md:py-6">
       <h1 className="text-4xl md:text-5xl font-bold mt-4 mb-3 md:my-4 shrink-0">
         <PastelText text={title} />
       </h1>

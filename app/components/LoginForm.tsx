@@ -5,7 +5,6 @@ import { auth } from "@/lib/firebase";
 import {
   signInWithEmailAndPassword,
   onAuthStateChanged,
-  signOut,
 } from "firebase/auth";
 import {
   Dialog,
@@ -50,11 +49,6 @@ export default function LoginModal({ open, onOpenChange }: LoginModalProps) {
     }
   };
 
-  const handleLogout = async () => {
-    await signOut(auth);
-    toast.success("Logout berhasil");
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-sm">
@@ -80,10 +74,7 @@ export default function LoginModal({ open, onOpenChange }: LoginModalProps) {
           />
         </div>
 
-        <div className="mt-4 flex justify-end space-x-2">
-          <Button variant="outline" onClick={handleLogout}>
-            Logout
-          </Button>
+        <div className="mt-4 flex justify-end">
           <Button onClick={handleLogin} disabled={loading}>
             {loading ? "Login..." : "Login"}
           </Button>
